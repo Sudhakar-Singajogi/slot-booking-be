@@ -1,0 +1,37 @@
+const Sequelize = require("sequelize");
+const path = require("path");
+const sequelize = require(path.resolve("src/dbconn/connection"));
+
+module.exports = sequelize.define("venuedetails", {
+  venueId: {
+    type: Sequelize.INTEGER(11),
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  arena_id: {
+    type: Sequelize.STRING(300),
+    allowNull: false,
+    unique: true,
+  },
+  arena_manager: {
+    type: Sequelize.STRING(256),
+    allowNull: false,
+  },
+  arena_location: {
+    type: Sequelize.STRING(256),
+    allowNull: false,
+  },
+  manager_contact1: {
+    type: Sequelize.STRING(256),
+    allowNull: true,
+  },
+  manager_contact2: {
+    type: Sequelize.STRING(256),
+    allowNull: true,
+  },
+  status: {
+    type: Sequelize.ENUM("1", "0"),
+    allowNull: false,
+    defaultValue: "1",
+  },
+});
