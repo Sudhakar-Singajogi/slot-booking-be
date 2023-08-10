@@ -9,6 +9,10 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
+      arena_name:{
+        type: Sequelize.STRING(256),
+        allowNull: false,
+      },
       arena_id:{
         type: Sequelize.STRING(300),
         allowNull: false,

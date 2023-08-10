@@ -14,8 +14,18 @@ router.post("/byareana", async (req, res) => {
 
   const reqObj = req.body;
   var resultSet = await turfServ.getTurfsByAreana(reqObj);
+  console.log('resultSet is:', resultSet); 
 
   await Utils.retrunResponse(res, resultSet);
+});
+
+router.post("/sports", async (req, res) => { 
+
+const reqObj = req.body;
+var resultSet = await turfServ.getSportssByTurf(reqObj);
+console.log('resultSet is:', resultSet); 
+
+await Utils.retrunResponse(res, resultSet);
 });
 
 router.post("/details/:id", async (req, res) => {
