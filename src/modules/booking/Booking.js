@@ -1,9 +1,9 @@
-"use strict";
+const Sequelize = require("sequelize");
+const path = require("path");
+const sequelize = require(path.resolve("src/dbconn/connection"));
 
-module.exports = {
-  async up(queryInterface, Sequelize) {
-    queryInterface.createTable("bookings", {
-      bookingId: {
+module.exports = sequelize.define("bookings", {
+    bookingId: {
         type: Sequelize.INTEGER(11),
         primaryKey: true,
         autoIncrement: true,
@@ -38,18 +38,10 @@ module.exports = {
         allowNull: false,
         defaultValue: "0",
       },
-      createdAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.fn("now"),
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.fn("now"),
-      },
-    });
-  },
+});
 
-  async down(queryInterface, Sequelize) {
-    queryInterface.dropTable("bookings");
-  },
-};
+
+
+
+
+

@@ -2,7 +2,7 @@ const dateTime = require("node-datetime");
 const Cryptr = require("cryptr");
 const cryptr = new Cryptr("7b75a472b65bc4a42e7b3f7883");
 const winston = require("winston");
-
+const mysql = require("mysql2");
 const crypto = require("crypto");
 const algorithm = "aes-256-cbc"; //Using AES encryption
 const key = crypto.randomBytes(32);
@@ -15,6 +15,7 @@ const sequelize = require(path.resolve("src/dbconn/", "connection"));
 const Sequelize = require("sequelize");
 const fs = require("fs");
 const nodemailer = require("nodemailer");
+const Op = Sequelize.Op;
 
 const getDateTime = () => {
   const dt = dateTime.create();
@@ -28,7 +29,11 @@ async function returnResult(
   totalRecords = null
 ) {
   // console.log("got obj as", object);
-  if (object && !object.hasOwnProperty("ValidationErrors")  && !object.hasOwnProperty("DBErrors") ) {
+  if (
+    object &&
+    !object.hasOwnProperty("ValidationErrors") &&
+    !object.hasOwnProperty("DBErrors")
+  ) {
     return customMsg != null
       ? { message: customMsg, result: [] }
       : {
@@ -37,9 +42,9 @@ async function returnResult(
           totalRows: totalRecords > 0 ? totalRecords : 0,
         };
   } else {
-    if (object && object.hasOwnProperty("ValidationErrors")) {
+    if (object && object.hasOwnProperty("ValidationErrors")) { 
       return customMsg != null
-        ? { message: customMsg, result: [] }
+        ? { message: customMsg, result: ["ssr"] }
         : {
             message: "Validation Errors",
             result: object,
@@ -79,7 +84,7 @@ async function retrunResponse(res, Obj) {
     resultCode = 200;
     Obj.message = Obj.message.split(" for key")[0].replace(/'/g, "");
   }
-  if (Obj.message.includes("Validation Errors")) {
+  if (Obj.message.includes("Validation Errors")) { 
     resultCode = 200;
     Obj.message = Obj.message.split(" for key")[0].replace(/'/g, "");
     ValidationErrors = Obj.result.ValidationErrors;
@@ -97,10 +102,16 @@ async function retrunResponse(res, Obj) {
     resultCode = 401;
     Obj.message = Obj.message.split(" for key")[0].replace(/'/g, "");
   }
-  
-  data = (Obj.result.hasOwnProperty('resultSet')) ? Obj.result.resultSet: Obj.result; 
-  resultTotal = (Obj.result.hasOwnProperty('resultSet')) ? Obj.result.resultSet.length : Obj.result.length;
-  hasMore = (Obj.result.hasOwnProperty('resultSet')) ? Obj.totalRows > Obj.result.resultSet.length : Obj.totalRows > Obj.result.length 
+
+  data = Obj.result.hasOwnProperty("resultSet")
+    ? Obj.result.resultSet
+    : Obj.result;
+  resultTotal = Obj.result.hasOwnProperty("resultSet")
+    ? Obj.result.resultSet.length
+    : Obj.result.length;
+  hasMore = Obj.result.hasOwnProperty("resultSet")
+    ? Obj.totalRows > Obj.result.resultSet.length
+    : Obj.totalRows > Obj.result.length;
 
   return res.status(resultCode).json({
     result: "OK",
@@ -355,6 +366,7 @@ async function checkRowExists(cond, model, message, groupby = false) {
 
     return totalRows;
   } catch (err) {
+    console.log("error is: ", err);
     return 0;
   }
 }
@@ -372,8 +384,7 @@ async function getTotalRows(
 async function fetchRows(obj) {
   const model = obj.model;
   try {
-    
-    console.log('fetchCondi:', obj.fetchRowsCond);
+    console.log("fetchCondi:", obj.fetchRowsCond);
 
     var params = {
       where: obj.fetchRowsCond,
@@ -436,7 +447,7 @@ async function getRowByPk(obj) {
 async function bulkInsertUpdate(paramObj) {
   const model = paramObj.model;
   console.log("paramObj:", paramObj);
-  console.log("updateOnDuplicateFields:", paramObj.updateOnDuplicateFields); 
+  console.log("updateOnDuplicateFields:", paramObj.updateOnDuplicateFields);
 
   const resultSet = await model
     .bulkCreate(
@@ -549,23 +560,23 @@ async function findOne(obj) {
     attributes: {
       exclude: ["createdAt", "updatedAt"],
     },
-  };  
+  };
 
-  if( obj.hasOwnProperty('includes'))  {
+  if (obj.hasOwnProperty("includes")) {
     params.attributes.include = obj.includes;
   }
 
-  if(obj.hasOwnProperty('excludes')) {
-    params.attributes.exclude = [...params.attributes.exclude, ...obj.excludes ];
+  if (obj.hasOwnProperty("excludes")) {
+    params.attributes.exclude = [...params.attributes.exclude, ...obj.excludes];
   }
-  
+
   if (obj.hasOwnProperty("fetchRowCond")) {
     params.where = obj.fetchRowCond;
   }
 
-  if(obj.hasOwnProperty("order")) {
-    params.order = [obj.order]
-  }  
+  if (obj.hasOwnProperty("order")) {
+    params.order = [obj.order];
+  }
 
   const model = obj.model;
   try {
@@ -582,7 +593,6 @@ async function findOne(obj) {
       errorMs: error,
     };
   }
-  
 }
 
 async function getCurrentDateTimeYMD() {
@@ -627,39 +637,161 @@ const encryptData = (data) => {
 
 async function updateData(model, data, cond) {
   try {
-    await model.update(data,cond);
+    await model.update(data, cond);
     return {
-      error:false,
-      errorMessage:''
-    }
-
-  } catch(err) {
+      error: false,
+      errorMessage: "",
+    };
+  } catch (err) {
     return {
-      error:true,
-      errorMessage:err
-    }
+      error: true,
+      errorMessage: err,
+    };
   }
 }
 
-function convertStringToUpperLowercase(str, textCase="upper") {
-  let convertedString = '';
-  
+function convertStringToUpperLowercase(str, textCase = "upper") {
+  let convertedString = "";
+
   for (let i = 0; i < str.length; i++) {
     const char = str.charAt(i);
-    
+
     if (/[a-zA-Z]/.test(char)) {
       convertedString += char.toUpperCase();
-      if(textCase === 'lower') {
-        convertedString += char.toLowerCase();  
+      if (textCase === "lower") {
+        convertedString += char.toLowerCase();
       }
     } else {
       convertedString += char;
     }
   }
-  
+
   return convertedString;
 }
 
+async function executeQuery(obj, connection) {
+  // Replace with your database credentials
+  try {
+    // Your raw SQL query
+    const rawQuery = `
+      SELECT COUNT(*) AS count
+      FROM upcoming_bookings
+      WHERE arena_id = ?
+      AND turf_id = ?
+      AND bookedAT <= ?
+      AND bookedTill >= ?
+    `;
+
+    // Replace with the actual values
+    const values = [obj.arena_id, obj.turf, obj.bookedTill, obj.bookedAt];
+
+    // Execute the query
+    const [results] = await connection.execute(rawQuery, values);
+    console.log("Result:", results);
+    return results;
+  } catch (error) {
+    return error;
+    console.error("Error:", error);
+  } finally {
+    // Close the connection
+    connection.end();
+  }
+}
+
+async function checkTurfAvailability(obj) {
+  return new Promise((resolve, reject) => {
+    
+    const connection = mysql.createConnection({
+      host: "localhost",
+      user: "root",
+      password: "",
+      database: "slotbooking",
+    });
+
+    // Open the connection
+    connection.connect();
+
+    // Your raw SQL query
+    const rawQuery = `
+      SELECT COUNT(*) AS count
+      FROM upcoming_bookings
+      WHERE arena_id = ?
+      AND turf_id = ?
+      AND bookedAT <= ?
+      AND bookedTill >= ?
+    `;
+
+    // Replace with the actual values
+    const values = [obj.arena_id, obj.turf, obj.bookedTill, obj.bookedAt];
+
+    // Execute the query
+    connection.query(rawQuery, values, (error, results) => {
+      if (error) {
+        console.error("Error:", error);
+        reject(error);
+      } else {
+        console.log("Result:", results);
+        console.log("count is: ", results[0].count);
+        resolve(results[0].count > 0 ? false : true);
+      }
+
+      // Close the connection
+      connection.end();
+    });
+
+    
+
+    
+  }); 
+
+  /*
+  //Model for upcoming_bookings models
+  
+  const UpcomingBookingView = sequelize.define('upcoming_bookings', {
+    arena_id: Sequelize.STRING,
+    turf_id: Sequelize.STRING,
+    bookedDate: Sequelize.STRING,
+    booked_at: Sequelize.STRING,
+    bookedAT: Sequelize.BIGINT,
+    bookedTill: Sequelize.BIGINT
+  }, {
+    timestamps: false, // Disable timestamps
+    tableName: 'upcoming_bookings' // Specify the actual view name
+  }); 
+
+  try {
+    const query = `
+      SELECT COUNT(*) AS count
+      FROM upcoming_bookings
+      WHERE arena_id = :arena_id
+      AND turf_id = :turf_id
+      AND bookedAT <= :bookedTill
+      AND bookedTill >= :bookedAt
+    `;
+    
+    const replacements = {
+      arena_id: obj.arena_id,
+      turf_id: obj.turf,
+      bookedAt: obj.bookedAt,
+      bookedTill: obj.bookedTill
+    };
+    
+    const result = await sequelize.query(query, {
+      raw: true,
+      model: UpcomingBookingView,
+      replacements,
+      type: Sequelize.QueryTypes.SELECT
+    });
+    console.log("res is: ", result);
+
+    return result[0].count > 0 ? false : true;
+
+  } catch (error) {
+    console.error('Error:', error);
+    return false;
+  } 
+*/
+}
 
 module.exports = {
   getDateTime,
@@ -695,5 +827,6 @@ module.exports = {
   sendMail,
   encryptData,
   updateData,
-  convertStringToUpperLowercase
+  convertStringToUpperLowercase,
+  checkTurfAvailability,
 };

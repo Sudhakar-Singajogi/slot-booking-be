@@ -19,24 +19,7 @@ module.exports = {
     const totalResults = 1;
 
     try {
-      const condition = { arena_id: reqBody.arena_id };
-      const isAreanaExists = await Utils.checkRowExists(
-        condition,
-        venueModel,
-        "check whether areana exists"
-      );
-
-      if (isAreanaExists === 0) {
-        errors.push({
-          sectionName: `Invalid venue provided`,
-        });
-      }
-
-      if (errors.length > 0) {
-        return await Utils.returnResult("Areana existance", {
-          ValidationErrors: errors,
-        });
-      }
+      const condition = { arena_id: reqBody.arena_id }; 
 
       const excludeFields = ["manager_contact1", "manager_contact2", "status", "createdAt", "updatedAt"];
 

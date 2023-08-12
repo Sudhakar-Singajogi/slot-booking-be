@@ -64,6 +64,7 @@ module.exports = {
         "resultCode": "401",
         "message": "Access Token is required"
     },
+    INVALIDARENA:"Please check the venue id provided",
     OK: "OK",
     MAILSENT: "mail sent",
     ERRMSG: "error message",

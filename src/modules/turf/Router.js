@@ -2,10 +2,10 @@ const express = require("express");
 const router = express.Router();
 const path = require("path");
 const Utils = require(path.resolve("src//utils"));
-
 const turfServ = require(path.resolve("src/modules/turf/Services"));
+const {checkArenaExists} = require(path.resolve("src/middlewares/arenaexists"));
 
-router.post("/byareana", async (req, res) => {
+router.post("/byareana", checkArenaExists(), async (req, res, next) => {
     //   let resultSet = {
     //     message:"User Signin-up module",
     //     result:[],
@@ -19,7 +19,9 @@ router.post("/byareana", async (req, res) => {
   await Utils.retrunResponse(res, resultSet);
 });
 
-router.post("/sports", async (req, res) => { 
+
+
+router.post("/sports",checkArenaExists(),  async (req, res, next) => { 
 
 const reqObj = req.body;
 var resultSet = await turfServ.getSportssByTurf(reqObj);
@@ -28,13 +30,13 @@ console.log('resultSet is:', resultSet);
 await Utils.retrunResponse(res, resultSet);
 });
 
-router.post("/details/:id", async (req, res) => {
-  let resultSet = {
-    message: "User Signin-up module",
-    result: [],
-    totalRows: 0,
-  };
+router.post("/exists", checkArenaExists(), async (req, res, next) => {
+const reqObj = req.body;
+var resultSet = await turfServ.checkTurfExists(reqObj);
+console.log('resultSet is:', resultSet); 
 
-  await Utils.retrunResponse(res, resultSet);
+await Utils.retrunResponse(res, resultSet);
 });
+
+
 module.exports = router;

@@ -60,11 +60,11 @@ module.exports = {
           ValidationErrors: errors,
         });
       }
-      
+
       const totalResults = await Utils.getTotalRows(
         turfModel,
         turfModel,
-        "Get total turfs of a venue",
+        "Get total turfs of a venue"
       );
       const excludeFields = ["status", "createdAt", "updatedAt"];
 
@@ -74,8 +74,8 @@ module.exports = {
       const fetchObjParams = {
         model: turfModel,
         fetchRowsCond: condition,
-        offSe:0,
-        limit:100,
+        offSe: 0,
+        limit: 100,
         msg,
         excludeFields,
         includes,
@@ -101,11 +101,10 @@ module.exports = {
   },
   getSportssByTurf: async (reqBody) => {
     var errors = [];
-    
 
     try {
       const condition = { turfid: reqBody.turfid, arena_id: reqBody.arena_id };
-      console.log('condition is:', condition);
+      console.log("condition is:", condition);
       const isTurfExists = await Utils.checkRowExists(
         condition,
         turfModel,
@@ -123,11 +122,11 @@ module.exports = {
           ValidationErrors: errors,
         });
       }
-      
+
       const totalResults = await Utils.getTotalRows(
-        {turfid: reqBody.turfid},
+        { turfid: reqBody.turfid },
         sportModel,
-        "Get total sports can play on a turf",
+        "Get total sports can play on a turf"
       );
       const excludeFields = ["turfid", "createdAt", "updatedAt"];
 
@@ -136,9 +135,9 @@ module.exports = {
       const msg = "Get total sports can play on a turf";
       const fetchObjParams = {
         model: sportModel,
-        fetchRowsCond: {turfid: reqBody.turfid},
-        offSe:0,
-        limit:100,
+        fetchRowsCond: { turfid: reqBody.turfid },
+        offSe: 0,
+        limit: 100,
         msg,
         excludeFields,
         includes,
@@ -160,6 +159,30 @@ module.exports = {
     } catch (err) {
       console.log("syntax:", err);
       return await Utils.catchError("Fetching sports by turf", err);
+    }
+  },
+  checkTurfExists: async (reqBody) => {
+    try {
+      const isAvailable = await Utils.checkTurfAvailability(reqBody);
+      let obj = {
+        resultSet: {
+          totalRows: 0,
+          data:[],
+        },
+        ValidationErrors:"turf is not available at this time"
+        
+      };
+      return !isAvailable
+        ? await Utils.returnResult(
+            "turf",
+            obj,
+            null,
+            0
+          )
+        : await Utils.returnResult("sports", false, "Is available");
+    } catch (error) {
+      console.log(error);
+      return await Utils.catchError("Fetching turf existence failed", error);
     }
   },
 };
