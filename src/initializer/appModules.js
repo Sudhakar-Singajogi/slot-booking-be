@@ -3,5 +3,6 @@ exports.modules = [
   "registration",
   "venue",
   "turf",
-  "booking"
+  "booking",
+  "captain",
 ];
