@@ -16,6 +16,10 @@ module.exports = sequelize.define("bookings", {
         type: Sequelize.INTEGER(11),
         allowNull: false,
       },
+      gameid: {
+        type: Sequelize.INTEGER(11),
+        allowNull: false,
+      },
       booked_by: {
         type: Sequelize.INTEGER(11),
         allowNull: false,
@@ -24,6 +28,10 @@ module.exports = sequelize.define("bookings", {
         type: Sequelize.DATE,
         allowNull: false,
       },
+      booked_at: {
+        type: Sequelize.STRING(300),
+        allowNull: false, 
+      },      
       total_hrs: {
         type: Sequelize.INTEGER(11),
         allowNull: false,

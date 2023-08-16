@@ -1,41 +1,45 @@
-'use strict';
+"use strict";
 
 module.exports = {
-  async up (queryInterface, Sequelize) {
-    
+  async up(queryInterface, Sequelize) {
     queryInterface.createTable("orders", {
       orderId: {
         type: Sequelize.INTEGER(11),
         primaryKey: true,
         autoIncrement: true,
       },
-      bookingid:{
+      orderCreationId: {
+        type: STRING(256),
+        allowNull: false,
+      },
+
+      bookingid: {
         type: Sequelize.INTEGER(11),
-        allowNull: false, 
+        allowNull: false,
       },
       turf_cost: {
         type: Sequelize.FLOAT(11),
-        allowNull: false, 
+        allowNull: false,
       },
       advanced_paid: {
         type: Sequelize.FLOAT(11),
-        allowNull: false, 
+        allowNull: false,
       },
       balance_amount: {
         type: Sequelize.FLOAT(11),
-        allowNull: false, 
+        allowNull: false,
       },
       refund_amount: {
         type: Sequelize.FLOAT(11),
-        allowNull: false, 
+        allowNull: false,
       },
       coupon_code: {
         type: Sequelize.STRING(256),
-        allowNull: false, 
+        allowNull: false,
       },
       coupon_amount: {
         type: Sequelize.FLOAT(11),
-        allowNull: false, 
+        allowNull: false,
       },
       status: {
         type: Sequelize.ENUM("1", "0"),
@@ -50,11 +54,10 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.fn("now"),
       },
-
-    })
+    });
   },
 
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface, Sequelize) {
     queryInterface.dropTable("orders");
-  }
+  },
 };

@@ -636,6 +636,12 @@ const encryptData = (data) => {
 };
 
 async function updateData(model, data, cond) {
+  /* cond should be like below
+  
+  const cond = {
+      where: { email: reqObj.email },
+    };
+    */
   try {
     await model.update(data, cond);
     return {

@@ -163,6 +163,12 @@ module.exports = {
   },
   checkTurfExists: async (reqBody) => {
     try {
+      reqBody = {
+        ...reqBody,
+        bookedAt :reqBody.bookedAt-1000,
+        bookedTill :reqBody.bookedTill-1000,
+
+      }
       const isAvailable = await Utils.checkTurfAvailability(reqBody);
       let obj = {
         resultSet: {

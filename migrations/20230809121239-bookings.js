@@ -10,9 +10,13 @@ module.exports = {
       },
       arena_id: {
         type: Sequelize.STRING(300),
-        allowNull: false, 
+        allowNull: false,
       },
       turfid: {
+        type: Sequelize.INTEGER(11),
+        allowNull: false,
+      },
+      gameid: {
         type: Sequelize.INTEGER(11),
         allowNull: false,
       },
@@ -22,6 +26,10 @@ module.exports = {
       },
       booked_on: {
         type: Sequelize.DATE,
+        allowNull: false,
+      },
+      booked_at: {
+        type: Sequelize.STRING(300),
         allowNull: false,
       },
       total_hrs: {
