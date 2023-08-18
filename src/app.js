@@ -9,6 +9,8 @@ const bodyParser = require("body-parser");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 
+const ipAddress = '192.168.0.103';
+const port = 8080;
 
 var dbConnectionMessage = "";
 sequelize
@@ -105,9 +107,10 @@ class App {
         });
     }
     */
+   
 
     connectServer() {
-        app.listen(process.env.PORT || 8080, () => {
+        app.listen(process.env.PORT || port, ipAddress,  () => {
             console.log("Hey am running on port 8080");
         });
     }

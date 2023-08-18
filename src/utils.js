@@ -42,7 +42,7 @@ async function returnResult(
           totalRows: totalRecords > 0 ? totalRecords : 0,
         };
   } else {
-    if (object && object.hasOwnProperty("ValidationErrors")) { 
+    if (object && object.hasOwnProperty("ValidationErrors")) {
       return customMsg != null
         ? { message: customMsg, result: ["ssr"] }
         : {
@@ -84,7 +84,7 @@ async function retrunResponse(res, Obj) {
     resultCode = 200;
     Obj.message = Obj.message.split(" for key")[0].replace(/'/g, "");
   }
-  if (Obj.message.includes("Validation Errors")) { 
+  if (Obj.message.includes("Validation Errors")) {
     resultCode = 200;
     Obj.message = Obj.message.split(" for key")[0].replace(/'/g, "");
     ValidationErrors = Obj.result.ValidationErrors;
@@ -673,40 +673,10 @@ function convertStringToUpperLowercase(str, textCase = "upper") {
   }
 
   return convertedString;
-}
-
-async function executeQuery(obj, connection) {
-  // Replace with your database credentials
-  try {
-    // Your raw SQL query
-    const rawQuery = `
-      SELECT COUNT(*) AS count
-      FROM upcoming_bookings
-      WHERE arena_id = ?
-      AND turf_id = ?
-      AND bookedAT <= ?
-      AND bookedTill >= ?
-    `;
-
-    // Replace with the actual values
-    const values = [obj.arena_id, obj.turf, obj.bookedTill, obj.bookedAt];
-
-    // Execute the query
-    const [results] = await connection.execute(rawQuery, values);
-    console.log("Result:", results);
-    return results;
-  } catch (error) {
-    return error;
-    console.error("Error:", error);
-  } finally {
-    // Close the connection
-    connection.end();
-  }
-}
+} 
 
 async function checkTurfAvailability(obj) {
   return new Promise((resolve, reject) => {
-    
     const connection = mysql.createConnection({
       host: "localhost",
       user: "root",
@@ -718,17 +688,37 @@ async function checkTurfAvailability(obj) {
     connection.connect();
 
     // Your raw SQL query
+
+    // const rawQuery = `
+    //   SELECT COUNT(*) AS count
+    //   FROM upcoming_bookings
+    //   WHERE arena_id = ?
+    //   AND turf_id = ?
+    //   AND bookedAT <= ?
+    //   AND bookedTill >= ?
+    // `;
+
     const rawQuery = `
-      SELECT COUNT(*) AS count
-      FROM upcoming_bookings
-      WHERE arena_id = ?
-      AND turf_id = ?
-      AND bookedAT <= ?
-      AND bookedTill >= ?
-    `;
+    SELECT COUNT(*) AS count
+    FROM upcoming_bookings
+    WHERE arena_id = ?
+    AND turf_id = ?
+    AND (
+        (bookedAt BETWEEN ? AND ?) OR (bookedTill BETWEEN ? AND ?)
+    )`;
 
     // Replace with the actual values
-    const values = [obj.arena_id, obj.turf, obj.bookedTill, obj.bookedAt];
+    const values = [
+      obj.arena_id,
+      obj.turf_id,
+      obj.bookedAt,
+      obj.bookedTill,
+      obj.bookedAt,
+      obj.bookedTill,
+    ];
+
+    console.log("Executing query:", rawQuery, "with values:", values);
+
 
     // Execute the query
     connection.query(rawQuery, values, (error, results) => {
@@ -744,60 +734,9 @@ async function checkTurfAvailability(obj) {
       // Close the connection
       connection.end();
     });
-
-    
-
-    
-  }); 
-
-  /*
-  //Model for upcoming_bookings models
-  
-  const UpcomingBookingView = sequelize.define('upcoming_bookings', {
-    arena_id: Sequelize.STRING,
-    turf_id: Sequelize.STRING,
-    bookedDate: Sequelize.STRING,
-    booked_at: Sequelize.STRING,
-    bookedAT: Sequelize.BIGINT,
-    bookedTill: Sequelize.BIGINT
-  }, {
-    timestamps: false, // Disable timestamps
-    tableName: 'upcoming_bookings' // Specify the actual view name
-  }); 
-
-  try {
-    const query = `
-      SELECT COUNT(*) AS count
-      FROM upcoming_bookings
-      WHERE arena_id = :arena_id
-      AND turf_id = :turf_id
-      AND bookedAT <= :bookedTill
-      AND bookedTill >= :bookedAt
-    `;
-    
-    const replacements = {
-      arena_id: obj.arena_id,
-      turf_id: obj.turf,
-      bookedAt: obj.bookedAt,
-      bookedTill: obj.bookedTill
-    };
-    
-    const result = await sequelize.query(query, {
-      raw: true,
-      model: UpcomingBookingView,
-      replacements,
-      type: Sequelize.QueryTypes.SELECT
-    });
-    console.log("res is: ", result);
-
-    return result[0].count > 0 ? false : true;
-
-  } catch (error) {
-    console.error('Error:', error);
-    return false;
-  } 
-*/
+  });
 }
+ 
 
 module.exports = {
   getDateTime,
