@@ -9,7 +9,7 @@ const bodyParser = require("body-parser");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 
-const ipAddress = '192.168.0.103';
+const ipAddress = '192.168.0.111';
 const port = 8080;
 
 var dbConnectionMessage = "";
