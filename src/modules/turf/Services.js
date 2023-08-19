@@ -6,7 +6,7 @@ const op = Sequelize.Op;
 
 let turfModel = require(path.resolve("src/modules/turf/Turf"));
 let venueModel = require(path.resolve("src/modules/venue/Venue"));
-let sportModel = require(path.resolve("src/modules/turf/sportsbyturf"));
+let sportModel = require(path.resolve("src/modules/turf/SportsByTurf"));
 
 turfModel.belongsTo(venueModel, {
   through: "arena_id",
