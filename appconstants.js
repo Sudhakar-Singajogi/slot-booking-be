@@ -26,10 +26,10 @@ module.exports = {
     DBHOST: "localhost",
     DATABASE: "express-bootstrap",
 
-    // DBUSER: "pranay",
-    // DATABASE: "sonet_school",
-    // DBHOST: "148.66.136.3",
-    // DBPASSWORD: "#lu4BkmNh3Zo",
+    DBUSER: "pranay",
+    DATABASE: "pyroslotbooking",
+    DBHOST: "148.66.136.3",
+    DBPASSWORD: "#lu4BkmNh3Zo",
     
     DIALECT: "mysql",
     DBPORT: "3306",

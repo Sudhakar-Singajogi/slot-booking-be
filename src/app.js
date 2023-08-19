@@ -1,16 +1,18 @@
 const express = require("express");
 const cors = require("cors");
-const path = require('path');
+const path = require("path");
 const app = express();
 const { connectRouters } = require(path.resolve("src/initializer/framework"));
 const sequelize = require(path.resolve("src/dbconn/connection"));
-const APPCONSTANTS =  require(path.resolve("appconstants"));
+const APPCONSTANTS = require(path.resolve("appconstants"));
 const bodyParser = require("body-parser");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 
-let ipAddress = '192.168.0.111';
-ipAddress = 'localhost'
+let ipAddress = "192.168.0.111";
+if (process.env.NODE_ENV === "production") {
+  ipAddress = "localhost";
+}
 const port = 8080;
 
 var dbConnectionMessage = "";
@@ -33,56 +35,52 @@ sequelize
       err;
   });
 
-
-
 class App {
-    constructor() {
-        console.log('loaded constr')
-        this.appUse();
-        this.routerConnection();
-        this.appSecurity();
-        // this.swaggerSetup();
-        this.connectServer();
-    }
+  constructor() {
+    console.log("loaded constr");
+    this.appUse();
+    this.routerConnection();
+    this.appSecurity();
+    // this.swaggerSetup();
+    this.connectServer();
+  }
 
-    appUse() {
-      //  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-        
-        app.use(express.json());
-        app.use(bodyParser.urlencoded({ extended: true }));
-        app.use(bodyParser.json());
-        app.use(
-            cors()
-        );
-    }
+  appUse() {
+    //  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-    routerConnection() {
-        connectRouters(app);
-        
-        app.get("/api", (req, res) => {
-          return res.status(200).json({
-            result: "OK",
-            resultCode: 200,
-            message: "Hey am express Modular coming from heroku & " + dbConnectionMessage,
-            ValidationErrors: "",
-            data: [],
-            totalRows: 0,
-          });
-        }); 
-        
-      }
+    app.use(express.json());
+    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(bodyParser.json());
+    app.use(cors());
+  }
 
-    appSecurity() {
-        app.use(helmet());
-        const limiter = rateLimit({
-            windowMs: 15 * 60 * 1000, // 15 minutes
-            max: 100 // limit each IP to 100 requests per windowMs
-        });
-        //  apply to all requests
-        app.use(limiter);
-    }
+  routerConnection() {
+    connectRouters(app);
 
- /*   swaggerSetup() {
+    app.get("/api", (req, res) => {
+      return res.status(200).json({
+        result: "OK",
+        resultCode: 200,
+        message:
+          "Hey am express Modular coming from heroku & " + dbConnectionMessage,
+        ValidationErrors: "",
+        data: [],
+        totalRows: 0,
+      });
+    });
+  }
+
+  appSecurity() {
+    app.use(helmet());
+    const limiter = rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100, // limit each IP to 100 requests per windowMs
+    });
+    //  apply to all requests
+    app.use(limiter);
+  }
+
+  /*   swaggerSetup() {
         const swagger = require("swagger-generator-express");
         const options = {
             title: "swagger-generator-express",
@@ -108,14 +106,18 @@ class App {
         });
     }
     */
-   
 
-    connectServer() {
-        app.listen(process.env.PORT || port, ipAddress,  () => {
-            console.log("Hey am running on port 8080");
-        });
+  connectServer() {
+    if (process.env.NODE_ENV === "production") {
+      app.listen(process.env.PORT || 8080, () => {
+        console.log("Hey am running on port 8080");
+      });
+    } else {
+      app.listen(process.env.PORT || port, ipAddress, () => {
+        console.log("Hey am running on port 8080");
+      });
     }
+  }
 }
 
 const mainApp = new App();
-  
