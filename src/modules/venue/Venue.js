@@ -8,7 +8,7 @@ module.exports = sequelize.define("venuedetails", {
     primaryKey: true,
     autoIncrement: true,
   },
-  arena_name:{
+  arena_name: {
     type: Sequelize.STRING(256),
     allowNull: false,
   },
@@ -22,6 +22,14 @@ module.exports = sequelize.define("venuedetails", {
     allowNull: false,
   },
   arena_location: {
+    type: Sequelize.STRING(256),
+    allowNull: false,
+  },
+  manager_email: {
+    type: Sequelize.STRING(256),
+    allowNull: false,
+  },
+  password: {
     type: Sequelize.STRING(256),
     allowNull: false,
   },

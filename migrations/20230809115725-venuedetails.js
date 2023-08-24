@@ -18,6 +18,14 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
+      manager_email: {
+        type: Sequelize.STRING(256),
+        allowNull: false,
+      },
+      password: {
+        type: Sequelize.STRING(256),
+        allowNull: false,
+      },
       arena_manager:{
         type: Sequelize.STRING(256),
         allowNull: false,
