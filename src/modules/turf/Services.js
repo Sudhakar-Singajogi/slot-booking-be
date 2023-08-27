@@ -165,30 +165,48 @@ module.exports = {
     try {
       reqBody = {
         ...reqBody,
-        bookedAt :reqBody.bookedAt-1000,
-        bookedTill :reqBody.bookedTill-1000,
-
-      }
+        bookedAt: reqBody.bookedAt - 1000,
+        bookedTill: reqBody.bookedTill - 1000,
+      };
       const isAvailable = await Utils.checkTurfAvailability(reqBody);
       let obj = {
         resultSet: {
           totalRows: 0,
-          data:[],
+          data: [],
         },
-        ValidationErrors:"turf is not available at this time"
-        
+        ValidationErrors: "turf is not available at this time",
       };
       return !isAvailable
-        ? await Utils.returnResult(
-            "turf",
-            obj,
-            null,
-            0
-          )
+        ? await Utils.returnResult("turf", obj, null, 0)
         : await Utils.returnResult("sports", false, "Is available");
     } catch (error) {
       console.log(error);
       return await Utils.catchError("Fetching turf existence failed", error);
+    }
+  },
+  getATurf: async (reqBody) => {
+    var errors = [];
+
+    try {
+      const condition = { turfid: reqBody.turfId};
+      const excludeFields = ["arena_id", "status", "createdAt", "updatedAt"];
+
+      const includes = [];
+      const msg = "Get A turf info for a turf";
+      const fetchObjParams = {
+        model: turfModel,
+        fetchRowCond: condition,
+        msg,
+        excludeFields,
+        includes,
+      };
+
+      const turf = await Utils.findOne(fetchObjParams);
+      console.log('turf:', turf)
+      return turf.resultSet ? await Utils.returnResult("turf", turf, null, 1) : await Utils.returnResult("turf", turf, "No record found");
+    } catch (err) {
+      console.log("syntax:", err);
+      return await Utils.catchError("Fetching sports by turf", err);
     }
   },
 };
