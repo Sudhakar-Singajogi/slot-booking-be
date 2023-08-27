@@ -188,7 +188,7 @@ module.exports = {
     var errors = [];
 
     try {
-      const condition = { turfid: reqBody.turfId};
+      const condition = { turfid: reqBody.turfId };
       const excludeFields = ["arena_id", "status", "createdAt", "updatedAt"];
 
       const includes = [];
@@ -202,11 +202,91 @@ module.exports = {
       };
 
       const turf = await Utils.findOne(fetchObjParams);
-      console.log('turf:', turf)
-      return turf.resultSet ? await Utils.returnResult("turf", turf, null, 1) : await Utils.returnResult("turf", turf, "No record found");
+      console.log("turf:", turf);
+      return turf.resultSet
+        ? await Utils.returnResult("turf", turf, null, 1)
+        : await Utils.returnResult("turf", turf, "No record found");
     } catch (err) {
       console.log("syntax:", err);
       return await Utils.catchError("Fetching sports by turf", err);
+    }
+  },
+  updateATurf: async (reqBody) => {
+    const condition = {
+      turfId: reqBody.body.turfId,
+      arena_id: reqBody.body.arena_id,
+    };
+    const turfData = reqBody.body;
+
+    delete reqBody.body.arena_id;
+    delete reqBody.body.turfId;
+
+    const turfUpdate = await Utils.updateData(turfModel, reqBody.body, {
+      where: condition,
+    });
+
+    console.log("turfUpdate: ", turfUpdate);
+    if (!turfUpdate.error) {
+      const excludeFields = ["arena_id", "status", "createdAt", "updatedAt"];
+
+      const includes = [];
+      const msg = "Get A turf info for a turf";
+      const fetchObjParams = {
+        model: turfModel,
+        fetchRowCond: condition,
+        msg,
+        excludeFields,
+        includes,
+      };
+
+      const turf = await Utils.findOne(fetchObjParams);
+      console.log("turf:", turf);
+      return turf.resultSet
+        ? await Utils.returnResult("turf", turf, null, 1)
+        : await Utils.returnResult("turf", turf, "No record found");
+    }
+  },
+  createATurf: async (reqBody) => {
+    try {
+      const turf = await turfModel.create(reqBody);
+      return await Utils.returnResult("turf", turf, null, 1);
+    } catch (error) {
+      console.error(error);
+      // res.status(500).send("Error in creating new turf");
+      return await Utils.returnResult("turf", [], "Error in creating new turf");
+    }
+  },
+  deleteATurf: async (reqBody) => {
+    const condition = { turfid: reqBody.turfId, arena_id: reqBody.arena_id };
+    const excludeFields = ["arena_id", "status", "createdAt", "updatedAt"];
+
+    const includes = [];
+    const msg = "Get A turf info for a turf";
+    const fetchObjParams = {
+      model: turfModel,
+      fetchRowCond: condition,
+      msg,
+      excludeFields,
+      includes,
+    };
+
+    const turf = await Utils.findOne(fetchObjParams);
+    if (turf.resultSet) {
+      return await turfModel
+        .destroy({
+          where: condition,
+        })
+        .then(async () => { 
+          return await Utils.returnResult("turf", turf, null, 1);
+        })
+        .catch(async (err) => {
+          await Utils.logToWinston(
+            "Failed in unassigning of the permissions due to:",
+            err
+          ); 
+        });
+    } else {
+      return await Utils.returnResult("turf", [], "No record found");
     }
   },
 };

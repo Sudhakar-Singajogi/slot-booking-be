@@ -44,4 +44,24 @@ router.post("/getdetails", checkArenaExists(), async (req, res, next) => {
   await Utils.retrunResponse(res, resultSet);
 });
 
+router.post("/update", checkArenaExists(), async (req, res, next) => { 
+  var resultSet = await turfServ.updateATurf(req);
+  console.log("resultSet is:", resultSet);
+  await Utils.retrunResponse(res, resultSet);
+});
+
+router.post("/create", checkArenaExists(), async (req, res, next) => {
+  const reqObj = req.body;
+  var resultSet = await turfServ.createATurf(reqObj);
+  console.log("resultSet is:", resultSet);
+  await Utils.retrunResponse(res, resultSet);
+})
+
+router.post("/delete", checkArenaExists(), async (req, res, next) =>{
+  const reqObj = req.body;
+  var resultSet = await turfServ.deleteATurf(reqObj);
+  console.log("resultSet is:", resultSet);
+  await Utils.retrunResponse(res, resultSet);
+})
+
 module.exports = router;

@@ -115,6 +115,8 @@ async function retrunResponse(res, Obj) {
     ? Obj.totalRows > Obj.result.resultSet.length
     : Obj.totalRows > Obj.result.length;
 
+    console.log('res obj is:', res)
+
   return res.status(resultCode).json({
     result: "OK",
     resultCode: resultCode,
