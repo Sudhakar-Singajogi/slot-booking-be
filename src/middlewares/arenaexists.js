@@ -6,6 +6,7 @@ let venueModel = require(path.resolve("src/modules/venue/Venue"));
 const checkArenaExists = () => {
   return async (req, res, next) => {
     const condition = { arena_id: req.body.arena_id };
+    console.log('condition:', condition)
     const isAreanaExists = await utils.checkRowExists(
       condition,
       venueModel,

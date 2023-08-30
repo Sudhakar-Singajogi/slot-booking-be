@@ -62,7 +62,7 @@ module.exports = {
       }
 
       const totalResults = await Utils.getTotalRows(
-        turfModel,
+        condition,
         turfModel,
         "Get total turfs of a venue"
       );
@@ -276,17 +276,60 @@ module.exports = {
         .destroy({
           where: condition,
         })
-        .then(async () => { 
+        .then(async () => {
+          await sportModel.destroy({
+            where: { turfid: reqBody.turfId},
+          });
           return await Utils.returnResult("turf", turf, null, 1);
         })
         .catch(async (err) => {
           await Utils.logToWinston(
             "Failed in unassigning of the permissions due to:",
             err
-          ); 
+          );
         });
     } else {
       return await Utils.returnResult("turf", [], "No record found");
     }
+  },
+  addSportsToTurf: async (reqBody) => {
+    const turfid = reqBody.sports[0].turfid;
+    const condition = { turfid: turfid };
+    // return false;
+    return await sportModel
+      .destroy({
+        where: condition,
+      })
+      .then(async () => {
+        // return await Utils.returnResult("sportbyturf", turf, null, 1);
+        const paramObj = {
+          model: sportModel,
+          data: reqBody.sports,
+          insertUpdate: "insert",
+          updateOnDuplicateFields: [],
+          fetchRowsCond: condition,
+          offset: 0,
+          limit: 100,
+          msg: "Add sports to turf",
+          excludeFields: ["createdAt", "updatedAt"],
+          feature: "AddSportstoTurf",
+          includes: [],
+          orderBy: [],
+        };
+
+        // bulk update the sections
+        const resp = await Utils.bulkInsertUpdate(paramObj);
+        console.log("sports are:", resp);
+
+        return await Utils.returnResult(
+          "Added sports to turf",
+          resp,
+          null,
+          resp.resultSet.length
+        );
+      })
+      .catch(async (err) => {
+        await Utils.logToWinston("Failed to add sports to turf:", err);
+      });
   },
 };

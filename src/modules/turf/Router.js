@@ -64,4 +64,11 @@ router.post("/delete", checkArenaExists(), async (req, res, next) =>{
   await Utils.retrunResponse(res, resultSet);
 })
 
+router.post("/addsports", checkArenaExists(), async (req, res, next) =>{ 
+  const reqObj = req.body;
+  var resultSet = await turfServ.addSportsToTurf(reqObj);
+  console.log("resultSet is:", resultSet);
+  await Utils.retrunResponse(res, resultSet);
+})
+
 module.exports = router;

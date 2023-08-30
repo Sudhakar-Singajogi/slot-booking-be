@@ -5,5 +5,6 @@ exports.modules = [
   "turf",
   "booking",
   "captain",
-  "order"
+  "order",
+  "coupons"
 ];
