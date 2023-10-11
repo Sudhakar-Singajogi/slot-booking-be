@@ -19,7 +19,7 @@ module.exports = {
     const totalResults = 1;
 
     try {
-    const captain_contact = reqBody.captain_contact.slice(2)
+    const captain_contact = reqBody.captain_contact.length > 10 ? reqBody.captain_contact.slice(2) : reqBody.captain_contact;
       const condition = { captain_contact: captain_contact }; 
       
       const fetchObjParams = {
@@ -45,9 +45,15 @@ module.exports = {
     }
   },
   create: async(reqBody) => {
+
+    try {
+
+    } catch(err) {
+      
+    }
     reqBody = {
         ...reqBody,
-        captain_contact: reqBody.captain_contact.slice(2),
+        captain_contact:  reqBody.captain_contact.length > 10 ? reqBody.captain_contact.slice(2) : reqBody.captain_contact,        
     };
     
     let insertCaptain = [reqBody];
@@ -69,15 +75,30 @@ module.exports = {
 
       const resp = await Utils.bulkInsertUpdate(paramObj);
       if (resp) {
-        return await Utils.returnResult(
-          "Create new captain",
-          resp.resultSet,
-          null,
-          resp.resultSet.length
-        ); 
+
+        console.log("response is: ", resp)
+
+        if(resp.resultSet.hasOwnProperty('FailedToCreate')) {
+          return await Utils.returnResult(
+            "Create new captain",
+            {"DBErrors" : "Failed to create captain"},
+            "Failed to create captain",
+            0
+          ); 
+
+        } else {
+          return await Utils.returnResult(
+            "Create new captain",
+            resp.resultSet,
+            null,
+            resp.resultSet.length
+          ); 
+
+        }
       } else {
-        await Utils.returnResult("Create and Assign Permissions", [], false);
+        await Utils.returnResult("Create Captain", [], false);
       }
+
   }
   
 };

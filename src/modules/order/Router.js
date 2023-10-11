@@ -18,6 +18,19 @@ router.post("/create-order", async (req, res, next) => {
   const advance_payment = reqBody.advance_payment;
   const balance_amount = reqBody.balance_amount;
 
+  let coupon_amount = 0;
+  let coupon_code = "NA";
+
+  if (
+    reqBody.hasOwnProperty("coupon_amount") &&
+    reqBody.hasOwnProperty("coupon_code")
+  ) {
+    coupon_amount = reqBody.coupon_amount;
+    coupon_code = reqBody.coupon_code;
+    delete reqBody.advance_payment;
+    delete reqBody.balance_amount;
+  }
+
   delete reqBody.booking_cost;
   delete reqBody.advance_payment;
   delete reqBody.balance_amount;
@@ -46,8 +59,8 @@ router.post("/create-order", async (req, res, next) => {
       advanced_paid: advance_payment,
       balance_amount: balance_amount,
       refund_amount: 0.0,
-      coupon_code: "NA",
-      coupon_amount: 0.0,
+      coupon_code: coupon_code,
+      coupon_amount: coupon_amount,
       status: "0",
     };
 

@@ -86,18 +86,28 @@ module.exports = {
         excludeFields,
         includes,
       };
-
+      
       const coupon = await Utils.findOne(fetchObjParams);
       console.log("coupon:", coupon);
       return coupon.resultSet
-        ? await Utils.returnResult("coupon", coupon, null, 1)
-        : await Utils.returnResult("coupon", coupon, "No record found");
+      ? await Utils.returnResult("coupon", coupon, null, 1)
+      : await Utils.returnResult("coupon", coupon, "No record found");
     } catch (err) {
       console.log("syntax:", err);
       return await Utils.catchError("Fetching a coupon", err);
     }
   },
-
+  createACoupon: async (reqBody) => {
+    try {
+      const coupon = await couponModel.create(reqBody);
+      return await Utils.returnResult("coupon", coupon, null, 1);
+    } catch (error) {
+      console.error(error);
+      // res.status(500).send("Error in creating new coupon");
+      return await Utils.returnResult("coupon", [], "Error in creating new coupon");
+    }
+  },
+  
   /*
   checkCouponExists: async (reqBody) => {
     try {
@@ -182,16 +192,6 @@ module.exports = {
       return turf.resultSet
         ? await Utils.returnResult("turf", turf, null, 1)
         : await Utils.returnResult("turf", turf, "No record found");
-    }
-  },
-  createACoupon: async (reqBody) => {
-    try {
-      const turf = await turfModel.create(reqBody);
-      return await Utils.returnResult("turf", turf, null, 1);
-    } catch (error) {
-      console.error(error);
-      // res.status(500).send("Error in creating new turf");
-      return await Utils.returnResult("turf", [], "Error in creating new turf");
     }
   },
 */

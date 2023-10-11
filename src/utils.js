@@ -17,8 +17,6 @@ const fs = require("fs");
 const nodemailer = require("nodemailer");
 const Op = Sequelize.Op;
 
-
-
 const getDateTime = () => {
   const dt = dateTime.create();
   return dt.format("Y-m-d H:M:S");
@@ -115,7 +113,7 @@ async function retrunResponse(res, Obj) {
     ? Obj.totalRows > Obj.result.resultSet.length
     : Obj.totalRows > Obj.result.length;
 
-    console.log('res obj is:', res)
+  console.log("res obj is:", res);
 
   return res.status(resultCode).json({
     result: "OK",
@@ -449,21 +447,31 @@ async function getRowByPk(obj) {
 }
 
 async function bulkInsertUpdate(paramObj) {
-  const model = paramObj.model;
-  console.log("paramObj:", paramObj);
-  console.log("updateOnDuplicateFields:", paramObj.updateOnDuplicateFields);
+  try {
+    const model = paramObj.model;
+    console.log("paramObj:", paramObj);
+    console.log("updateOnDuplicateFields:", paramObj.updateOnDuplicateFields);
 
-  const resultSet = await model
-    .bulkCreate(
-      paramObj.data,
-      paramObj.insertUpdate == "update"
-        ? { updateOnDuplicate: paramObj.updateOnDuplicateFields }
-        : { returning: true }
-    )
-    .then(async () => {
-      return await fetchRows(paramObj);
-    });
-  return resultSet ? resultSet : [];
+    const resultSet = await model
+      .bulkCreate(
+        paramObj.data,
+        paramObj.insertUpdate == "update"
+          ? { updateOnDuplicate: paramObj.updateOnDuplicateFields }
+          : { returning: true }
+      )
+      .then(async () => {
+        return await fetchRows(paramObj);
+      });
+    return resultSet ? resultSet : [];
+  } catch (err) {
+    console.log('failed to insert bulk data')
+    return {
+      success: false,
+      resultSet:{"FailedToCreate": true},
+      message: "Failed to Insert data",
+      errorMs: "Failed to Insert data",
+    };
+  }
 }
 
 function getMinYear(minusYears) {
@@ -677,7 +685,7 @@ function convertStringToUpperLowercase(str, textCase = "upper") {
   }
 
   return convertedString;
-} 
+}
 
 async function checkTurfAvailability(obj) {
   return new Promise((resolve, reject) => {
@@ -723,7 +731,6 @@ async function checkTurfAvailability(obj) {
 
     console.log("Executing query:", rawQuery, "with values:", values);
 
-
     // Execute the query
     connection.query(rawQuery, values, (error, results) => {
       if (error) {
@@ -740,9 +747,6 @@ async function checkTurfAvailability(obj) {
     });
   });
 }
-
-
- 
 
 module.exports = {
   getDateTime,

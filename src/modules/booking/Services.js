@@ -82,4 +82,6 @@ module.exports = {
     return await Utils.returnResult("booked slots", obj, null, results.length);    
     */
   },
+
+  
 };
