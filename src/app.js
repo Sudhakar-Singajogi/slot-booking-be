@@ -8,12 +8,20 @@ const APPCONSTANTS = require(path.resolve("appconstants"));
 const bodyParser = require("body-parser");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+require('dotenv').config();
+
 
 let ipAddress = "192.168.0.103";
-// let ipAddress = "192.168.0.111";
 if (process.env.NODE_ENV === "production") {
+  console.log('using productionone')
   ipAddress = "localhost";
+} else {
+  console.log('using develpoment')
 }
+
+// ipAddress = "192.168.0.111";
+// ipAddress = "192.168.153.242";
+
 const port = 8080;
 
 var dbConnectionMessage = "";

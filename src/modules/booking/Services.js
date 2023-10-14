@@ -38,7 +38,7 @@ module.exports = {
     WHERE arena_id = ?
     AND  DATE(bookedDate) = ?
     ${reqBody.hasOwnProperty("turf_id") ? "AND turf_id = ?" : ""}
-    `;
+    `; 
 
     const replacements = [
       reqBody.arena_id,

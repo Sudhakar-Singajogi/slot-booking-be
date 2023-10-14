@@ -464,10 +464,10 @@ async function bulkInsertUpdate(paramObj) {
       });
     return resultSet ? resultSet : [];
   } catch (err) {
-    console.log('failed to insert bulk data')
+    console.log("failed to insert bulk data");
     return {
       success: false,
-      resultSet:{"FailedToCreate": true},
+      resultSet: { FailedToCreate: true },
       message: "Failed to Insert data",
       errorMs: "Failed to Insert data",
     };
@@ -688,41 +688,47 @@ function convertStringToUpperLowercase(str, textCase = "upper") {
 }
 
 async function checkTurfAvailability(obj) {
+  let dbObj = {
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "slotbooking",
+  };
+  if (process.env.NODE_ENV === "production") {
+    dbObj = {
+      host: "148.66.136.3",
+      user: "pranay",
+      password: "#lu4BkmNh3Zo",
+      database: "pyroslotbooking",
+    };
+  }
+  
+
+  /*
   return new Promise((resolve, reject) => {
-    const connection = mysql.createConnection({
-      host: "localhost",
-      user: "root",
-      password: "",
-      database: "slotbooking",
-    });
+    
+
+    const connection = mysql.createConnection(dbObj);
 
     // Open the connection
-    connection.connect();
-
-    // Your raw SQL query
-
-    // const rawQuery = `
-    //   SELECT COUNT(*) AS count
-    //   FROM upcoming_bookings
-    //   WHERE arena_id = ?
-    //   AND turf_id = ?
-    //   AND bookedAT <= ?
-    //   AND bookedTill >= ?
-    // `;
+    connection.connect(); 
 
     const rawQuery = `
     SELECT COUNT(*) AS count
     FROM upcoming_bookings
     WHERE arena_id = ?
     AND turf_id = ?
+    AND bookedDate = ?
     AND (
         (bookedAt BETWEEN ? AND ?) OR (bookedTill BETWEEN ? AND ?)
-    )`;
+    )`; 
 
+    let bookedDate = obj.bookedDate + " 00:00:00"
     // Replace with the actual values
     const values = [
       obj.arena_id,
       obj.turf_id,
+      bookedDate,
       obj.bookedAt,
       obj.bookedTill,
       obj.bookedAt,
@@ -746,7 +752,59 @@ async function checkTurfAvailability(obj) {
       connection.end();
     });
   });
+  
+*/
+
+return new Promise((resolve, reject) => {
+
+   // Create a Sequelize instance
+   const sequelize = new Sequelize("pyroslotbooking", "pranay", "#lu4BkmNh3Zo", {
+    host: "148.66.136.3",
+    dialect: "mysql", // Or any other supported dialect
+  });
+
+  // Define your raw SQL query
+  // const sqlQuery = "SELECT * FROM your_table WHERE your_condition = :yourValue";
+  const sqlQuery = `
+  SELECT COUNT(*) AS count
+  FROM upcoming_bookings
+  WHERE arena_id = :arena_id
+  AND turf_id = :turf_id
+  AND bookedDate = :bookedDate
+  AND ((bookedAt BETWEEN :bookedAt AND :bookedTill) OR (bookedTill BETWEEN :bookedAt AND :bookedTill))`;
+
+  // Replace with the actual values
+
+  const values = {
+    arena_id: obj.arena_id,
+    turf_id: obj.turf_id,
+    bookedAt: obj.bookedAt,
+    bookedTill: obj.bookedTill,
+    bookedDate: obj.bookedDate + " 00:00:00",
+  };
+
+  // Execute the raw SQL query
+  sequelize
+    .query(sqlQuery, {
+      replacements: values, // Bind parameters
+      type: Sequelize.QueryTypes.SELECT, // Query type: SELECT, INSERT, UPDATE, DELETE, etc.
+    })
+    .then((results) => {
+      // `results` will contain the result of your query
+      console.log("Query result is:", results);
+
+      resolve(results[0].count > 0 ? false : true);
+    })
+    .catch((error) => {
+      console.error("Error executing the query:", error);
+      reject(error);
+    });
+
+});
+
 }
+ 
+
 
 module.exports = {
   getDateTime,
