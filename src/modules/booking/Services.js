@@ -33,7 +33,7 @@ module.exports = {
   },
   fetchSlotsBooked: async (reqBody) => {
     const query = `
-    SELECT  TIME(booked_at) as start, TIME(booked_till) as end
+    SELECT  turf_id as turf, TIME(booked_at) as start, TIME(booked_till) as end
     FROM upcoming_bookings
     WHERE arena_id = ?
     AND  DATE(bookedDate) = ?

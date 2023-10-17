@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === "production") {
   console.log('using develpoment')
 }
 
-// ipAddress = "192.168.0.111";
+ipAddress = "192.168.0.111";
 // ipAddress = "192.168.153.242";
 
 const port = 8080;
