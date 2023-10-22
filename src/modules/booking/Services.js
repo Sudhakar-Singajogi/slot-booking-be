@@ -61,26 +61,28 @@ module.exports = {
       },
     };
     return await Utils.returnResult("booked slots", obj, null, results.length);
+    
+  },
+  fetchBookingsInfo: async (reqBody) => {
+    const bookinsInfo = await Utils.getbookingsInfo(reqBody);
+    if(bookinsInfo.length > 0) {
+      let obj = bookinsInfo;
+      return await Utils.returnResult("booked slots", obj, null, bookinsInfo.length);
+    }
+    return await Utils.returnResult("bookinsInfo", false, null, 0);
+    console.log("bookinsInfo: ", bookinsInfo);
 
-    /*  const bookeddate = reqBody.bookedDate
-  const query = `
-  SELECT TIME(booked_at) as start, TIME(booked_till) as end
-  FROM upcoming_bookings
-  WHERE DATE(bookedDate) = '${bookeddate}';
-`;
+  },
 
-    const results = await sequelize.query(query, {
-      type: Sequelize.QueryTypes.SELECT,
-    });
+  fetchBookingsOrderDetails: async (reqBody) => {
+    const bookinsInfo = await Utils.getbookingOrderDetails(reqBody);
+    if(bookinsInfo.length > 0) {
+      let obj = bookinsInfo;
+      return await Utils.returnResult("booked slots", obj, null, bookinsInfo.length);
+    }
+    return await Utils.returnResult("bookinsInfo", false, null, 0);
+    console.log("bookinsInfo: ", bookinsInfo);
 
-    let obj = {
-      resultSet: {
-        totalRows: results.length,
-        data: results,
-      },
-    };
-    return await Utils.returnResult("booked slots", obj, null, results.length);    
-    */
   },
 
   

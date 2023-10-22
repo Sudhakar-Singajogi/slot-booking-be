@@ -702,70 +702,22 @@ async function checkTurfAvailability(obj) {
       database: "pyroslotbooking",
     };
   }
-  
 
-  /*
   return new Promise((resolve, reject) => {
-    
-
-    const connection = mysql.createConnection(dbObj);
-
-    // Open the connection
-    connection.connect(); 
-
-    const rawQuery = `
-    SELECT COUNT(*) AS count
-    FROM upcoming_bookings
-    WHERE arena_id = ?
-    AND turf_id = ?
-    AND bookedDate = ?
-    AND (
-        (bookedAt BETWEEN ? AND ?) OR (bookedTill BETWEEN ? AND ?)
-    )`; 
-
-    let bookedDate = obj.bookedDate + " 00:00:00"
-    // Replace with the actual values
-    const values = [
-      obj.arena_id,
-      obj.turf_id,
-      bookedDate,
-      obj.bookedAt,
-      obj.bookedTill,
-      obj.bookedAt,
-      obj.bookedTill,
-    ];
-
-    console.log("Executing query:", rawQuery, "with values:", values);
-
-    // Execute the query
-    connection.query(rawQuery, values, (error, results) => {
-      if (error) {
-        console.error("Error:", error);
-        reject(error);
-      } else {
-        console.log("Result:", results);
-        console.log("count is: ", results[0].count);
-        resolve(results[0].count > 0 ? false : true);
+    // Create a Sequelize instance
+    const sequelize = new Sequelize(
+      "pyroslotbooking",
+      "pranay",
+      "#lu4BkmNh3Zo",
+      {
+        host: "148.66.136.3",
+        dialect: "mysql", // Or any other supported dialect
       }
+    );
 
-      // Close the connection
-      connection.end();
-    });
-  });
-  
-*/
-
-return new Promise((resolve, reject) => {
-
-   // Create a Sequelize instance
-   const sequelize = new Sequelize("pyroslotbooking", "pranay", "#lu4BkmNh3Zo", {
-    host: "148.66.136.3",
-    dialect: "mysql", // Or any other supported dialect
-  });
-
-  // Define your raw SQL query
-  // const sqlQuery = "SELECT * FROM your_table WHERE your_condition = :yourValue";
-  const sqlQuery = `
+    // Define your raw SQL query
+    // const sqlQuery = "SELECT * FROM your_table WHERE your_condition = :yourValue";
+    const sqlQuery = `
   SELECT COUNT(*) AS count
   FROM upcoming_bookings
   WHERE arena_id = :arena_id
@@ -773,38 +725,150 @@ return new Promise((resolve, reject) => {
   AND bookedDate = :bookedDate
   AND ((bookedAt BETWEEN :bookedAt AND :bookedTill) OR (bookedTill BETWEEN :bookedAt AND :bookedTill))`;
 
-  // Replace with the actual values
+    // Replace with the actual values
 
-  const values = {
-    arena_id: obj.arena_id,
-    turf_id: obj.turf_id,
-    bookedAt: obj.bookedAt,
-    bookedTill: obj.bookedTill,
-    bookedDate: obj.bookedDate + " 00:00:00",
-  };
+    const values = {
+      arena_id: obj.arena_id,
+      turf_id: obj.turf_id,
+      bookedAt: obj.bookedAt,
+      bookedTill: obj.bookedTill,
+      bookedDate: obj.bookedDate + " 00:00:00",
+    };
 
-  // Execute the raw SQL query
-  sequelize
-    .query(sqlQuery, {
-      replacements: values, // Bind parameters
-      type: Sequelize.QueryTypes.SELECT, // Query type: SELECT, INSERT, UPDATE, DELETE, etc.
-    })
-    .then((results) => {
-      // `results` will contain the result of your query
-      console.log("Query result is:", results);
+    // Execute the raw SQL query
+    sequelize
+      .query(sqlQuery, {
+        replacements: values, // Bind parameters
+        type: Sequelize.QueryTypes.SELECT, // Query type: SELECT, INSERT, UPDATE, DELETE, etc.
+      })
+      .then((results) => {
+        // `results` will contain the result of your query
+        console.log("Query result is:", results);
 
-      resolve(results[0].count > 0 ? false : true);
-    })
-    .catch((error) => {
-      console.error("Error executing the query:", error);
-      reject(error);
-    });
-
-});
-
+        resolve(results[0].count > 0 ? false : true);
+      })
+      .catch((error) => {
+        console.error("Error executing the query:", error);
+        reject(error);
+      });
+  });
 }
- 
 
+async function getbookingsInfo(obj) {
+  let dbObj = {
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "slotbooking",
+  };
+  if (process.env.NODE_ENV === "production") {
+    dbObj = {
+      host: "148.66.136.3",
+      user: "pranay",
+      password: "#lu4BkmNh3Zo",
+      database: "pyroslotbooking",
+    };
+  }
+
+  return new Promise((resolve, reject) => {
+    // Create a Sequelize instance
+    const sequelize = new Sequelize(
+      "pyroslotbooking",
+      "pranay",
+      "#lu4BkmNh3Zo",
+      {
+        host: "148.66.136.3",
+        dialect: "mysql", // Or any other supported dialect
+      }
+    );
+
+    // Define your raw SQL query
+    // const sqlQuery = "SELECT * FROM your_table WHERE your_condition = :yourValue";
+    const sql_Query = `
+  SELECT COUNT(*) AS count
+  FROM upcoming_bookings
+  WHERE arena_id = :arena_id
+  AND turf_id = :turf_id
+  AND bookedDate = :bookedDate
+  AND ((bookedAt BETWEEN :bookedAt AND :bookedTill) OR (bookedTill BETWEEN :bookedAt AND :bookedTill))`;
+
+    let arenaId = "r434edd09765457698asd";
+
+    let sqlQuery = `select c.captainId as cid, c.captain_contact as mobile, b.booked_on as bookedOn, b.bookingId as bookingId, b.booked_at as bookedAt, td.turf_name as turf
+     from captains as c join bookings as b on b.booked_by=c.captainId join turfdetails as td on b.turfid=td.turfId where b.booked_on=:bookedDate 
+     and b.arena_id=:arena_id `;
+
+    // Replace with the actual values
+
+    const values = {
+      arena_id: obj.arena_id,
+      bookedDate: obj.bookedDate + " 00:00:00",
+    };
+
+    if (obj.hasOwnProperty("contact_number")) {
+      values.captain_contact = obj.contact_number;
+      sqlQuery += `and c.captain_contact=:captain_contact`;
+    }
+
+    // Execute the raw SQL query
+    sequelize
+      .query(sqlQuery, {
+        replacements: values, // Bind parameters
+        type: Sequelize.QueryTypes.SELECT, // Query type: SELECT, INSERT, UPDATE, DELETE, etc.
+      })
+      .then((results) => {
+        // `results` will contain the result of your query
+        console.log("Query result is:", results);
+
+        resolve(results);
+      })
+      .catch((error) => {
+        console.error("Error executing the query:", error);
+        reject([]);
+      });
+  });
+}
+
+async function getbookingOrderDetails(obj) {
+  return new Promise((resolve, reject) => {
+    // Create a Sequelize instance
+    const sequelize = new Sequelize(
+      "pyroslotbooking",
+      "pranay",
+      "#lu4BkmNh3Zo",
+      {
+        host: "148.66.136.3",
+        dialect: "mysql", // Or any other supported dialect
+      }
+    );
+
+    let sqlQuery = `SELECT b.bookingId as bookingId, o.orderId as orderId, b.booked_on as bookedOn, b.booked_at as bookedAt, b.total_hrs as hrs, o.turf_cost as turfCost, o.advanced_paid as advpaid, o.balance_amount as balAmount, o.coupon_amount as couponCost, c.captain_name, c.captain_contact, td.turf_name FROM bookings as b join orders as o on o.bookingid=b.bookingId join captains as c on c.captainId=b.booked_by join turfdetails as td on td.turfId=b.turfid where b.bookingId=:bookingId and b.arena_id=:arenaId`;
+
+    // Replace with the actual values
+
+    const values = {
+      arenaId: obj.arena_id,
+      bookingId: obj.bookingId
+    }; 
+
+    // Execute the raw SQL query
+    sequelize
+      .query(sqlQuery, {
+        replacements: values, // Bind parameters
+        type: Sequelize.QueryTypes.SELECT, // Query type: SELECT, INSERT, UPDATE, DELETE, etc.
+      })
+      .then((results) => {
+        // `results` will contain the result of your query
+        console.log("Query result is:", results);
+
+        resolve(results);
+      })
+      .catch((error) => {
+        console.error("Error executing the query:", error);
+        reject([]);
+      });
+  });
+}
 
 module.exports = {
   getDateTime,
@@ -842,4 +906,6 @@ module.exports = {
   updateData,
   convertStringToUpperLowercase,
   checkTurfAvailability,
+  getbookingsInfo,
+  getbookingOrderDetails,
 };
