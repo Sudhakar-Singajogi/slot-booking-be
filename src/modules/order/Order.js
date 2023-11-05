@@ -29,6 +29,14 @@ module.exports = sequelize.define("orders", {
     type: Sequelize.FLOAT(11),
     allowNull: false,
   },
+  balance_amount_paid: {
+    type: Sequelize.FLOAT(11),
+    allowNull: true,
+  },
+  balance_amount_paid_via: {
+    type: Sequelize.STRING(121),
+    allowNull: true,
+  },
   refund_amount: {
     type: Sequelize.FLOAT(11),
     allowNull: false,

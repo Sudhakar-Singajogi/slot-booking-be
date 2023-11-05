@@ -7,7 +7,8 @@ const { checkArenaExists } = require(path.resolve(
   "src/middlewares/arenaexists"
 ));
 
-router.post("/byareana", checkArenaExists(), async (req, res, next) => {
+// router.post("/byareana", checkArenaExists(), async (req, res, next) => {
+  router.post("/byareana", async (req, res, next) => {
   //   let resultSet = {
   //     message:"User Signin-up module",
   //     result:[],
@@ -21,7 +22,8 @@ router.post("/byareana", checkArenaExists(), async (req, res, next) => {
   await Utils.retrunResponse(res, resultSet);
 });
 
-router.post("/getcoupon", checkArenaExists(), async (req, res, next) => {
+// router.post("/getcoupon", checkArenaExists(), async (req, res, next) => {
+  router.post("/getcoupon", async (req, res, next) => {
   const reqObj = req.body;
   var resultSet = await couponServ.getACoupon(reqObj);
   console.log("resultSet is:", resultSet);
@@ -29,7 +31,8 @@ router.post("/getcoupon", checkArenaExists(), async (req, res, next) => {
   await Utils.retrunResponse(res, resultSet);
 });
 
-router.post("/addcoupon", checkArenaExists(), async (req, res, next) => {
+// router.post("/addcoupon", checkArenaExists(), async (req, res, next) => {
+  router.post("/addcoupon", async (req, res, next) => {
   const reqObj = req.body;
   var resultSet = await couponServ.createACoupon(reqObj);
   console.log("resultSet is:", resultSet);

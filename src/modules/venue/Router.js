@@ -7,7 +7,8 @@ const { checkArenaExists } = require(path.resolve(
   "src/middlewares/arenaexists"
 ));
 
-router.post("/details", checkArenaExists(), async (req, res, next) => {
+// router.post("/details", checkArenaExists(), async (req, res, next) => {
+  router.post("/details", async (req, res, next) => {
   //   let resultSet = {
   //     message: "User Signin-up module",
   //     result: [],
@@ -21,7 +22,8 @@ router.post("/details", checkArenaExists(), async (req, res, next) => {
   await Utils.retrunResponse(res, resultSet);
 });
 
-router.post("/exists", checkArenaExists(), async (req, res, next) => {
+// router.post("/exists", checkArenaExists(), async (req, res, next) => {
+  router.post("/exists", async (req, res, next) => {
   let resultSet = {
     message: "User Signin-up module",
     result: [],

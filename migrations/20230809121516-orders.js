@@ -29,6 +29,10 @@ module.exports = {
         type: Sequelize.FLOAT(11),
         allowNull: false,
       },
+      balance_amount_paid: {
+        type: Sequelize.FLOAT(11),
+        allowNull: true,
+      },
       refund_amount: {
         type: Sequelize.FLOAT(11),
         allowNull: false,
@@ -42,7 +46,7 @@ module.exports = {
         allowNull: false,
       },
       status: {
-        type: Sequelize.ENUM("1", "0"),
+        type: Sequelize.ENUM("1", "0", "2", "3"),
         allowNull: false,
         defaultValue: "0",
       },

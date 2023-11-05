@@ -37,7 +37,7 @@ module.exports = {
         allowNull: false,
       },
       is_weekend: {
-        type: Sequelize.ENUM("1", "0"),
+        type: Sequelize.ENUM("1", "0", "2", "3"),
         allowNull: false,
         defaultValue: "0",
       },

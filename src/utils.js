@@ -781,28 +781,18 @@ async function getbookingsInfo(obj) {
         dialect: "mysql", // Or any other supported dialect
       }
     );
+    
 
-    // Define your raw SQL query
-    // const sqlQuery = "SELECT * FROM your_table WHERE your_condition = :yourValue";
-    const sql_Query = `
-  SELECT COUNT(*) AS count
-  FROM upcoming_bookings
-  WHERE arena_id = :arena_id
-  AND turf_id = :turf_id
-  AND bookedDate = :bookedDate
-  AND ((bookedAt BETWEEN :bookedAt AND :bookedTill) OR (bookedTill BETWEEN :bookedAt AND :bookedTill))`;
-
-    let arenaId = "r434edd09765457698asd";
-
-    let sqlQuery = `select c.captainId as cid, c.captain_contact as mobile, b.booked_on as bookedOn, b.bookingId as bookingId, b.booked_at as bookedAt, td.turf_name as turf
-     from captains as c join bookings as b on b.booked_by=c.captainId join turfdetails as td on b.turfid=td.turfId where b.booked_on=:bookedDate 
-     and b.arena_id=:arena_id `;
+    let sqlQuery = `select c.captainId as cid, c.captain_contact as mobile, b.booked_on as bookedOn, b.bookingId as bookingId, b.booked_at as bookedAt, td.turf_name as turf,
+     o.balance_amount as balanceAmount from captains as c join bookings as b on b.booked_by=c.captainId join turfdetails as td on b.turfid=td.turfId join orders as o on o.bookingid=b.bookingId where b.booked_on=:bookedDate 
+     and b.arena_id=:arena_id and  o.status=:status `;
 
     // Replace with the actual values
 
     const values = {
       arena_id: obj.arena_id,
       bookedDate: obj.bookedDate + " 00:00:00",
+      status:'1'
     };
 
     if (obj.hasOwnProperty("contact_number")) {
@@ -822,7 +812,7 @@ async function getbookingsInfo(obj) {
 
         resolve(results);
       })
-      .catch((error) => {
+      .catch((error) => {        
         console.error("Error executing the query:", error);
         reject([]);
       });
