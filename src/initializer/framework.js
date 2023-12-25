@@ -8,7 +8,7 @@ const Utils = require(path.resolve("src/utils"));
 const cors = require("cors");
 /** Add the modules entity here */
 
-const Sequelize = require("sequelize"); 
+const Sequelize = require("sequelize");
 const sequelize = require(path.resolve("src/dbconn/connection"));
 
 const applicationModules = sequelize.define("Modules", {
@@ -30,15 +30,25 @@ const applicationModules = sequelize.define("Modules", {
 
 const joiMiddleware = (schema, property = false) => {
   return async (req, res, next) => {
-    const { error } = Joi.validate(req.body, schema);
-    console.log('joiMiddleware: ', error)
+    // const { error } = Joi.validate(req.body, schema);
+    const { error } = schema.validate(req.body, { abortEarly: false });
+    console.log("joiMiddleware: ", error);
     const valid = error == null;
     if (valid) {
       next();
     } else {
-      const { details } = error;
-      const message = details.map((i) => i.message).join(",");
-      res.status(200).json({ error: message });
+      // const { details } = error;
+      // const message = details.map((i) => i.message).join(",");
+      // res.status(200).json({ error: message });
+
+      return res.status(422).json({
+        status: "error",
+        message: "Validation failed",
+        errors: error.details.map((err) => ({
+          field: err.context.key,
+          message: err.message,
+        })),
+      });
     }
   };
 };
@@ -48,29 +58,28 @@ const connectRouters = (app) => {
     const currentElement = element.toLowerCase();
     console.log("currentElement: " + currentElement);
 
-    if (currentElement == "kickstart" || currentElement == "installation" || currentElement == "welcome") {
+    if (
+      currentElement == "kickstart" ||
+      currentElement == "installation" ||
+      currentElement == "welcome"
+    ) {
     } else {
       // addNewModule(currentElement);
     }
 
-    let routerPath = path.resolve("src/modules/" + currentElement + "/Router" )
-    console.log('routerPath:', routerPath);
-    console.log('route path', "/api/" + currentElement)
-    app.use(
-      "/api/" + currentElement,
-      require(routerPath)
-    );
-    
+    let routerPath = path.resolve("src/modules/" + currentElement + "/Router");
+    console.log("routerPath:", routerPath);
+    console.log("route path", "/api/" + currentElement);
+    app.use("/api/" + currentElement, require(routerPath));
+
     /*
     app.use(
       "/api/" + currentElement,
       require("../modules/" + currentElement + "/Router")
     );
     */
-
   });
   app.use(cors());
-
 };
 
 //to insert a new modules if not esists in the table

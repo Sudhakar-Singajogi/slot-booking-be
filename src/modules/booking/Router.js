@@ -7,20 +7,30 @@ const { checkArenaExists } = require(path.resolve(
   "src/middlewares/arenaexists"
 ));
 
+const { joiMiddleware } = require(path.resolve("src/initializer/framework"));
 
-router.post("/get-booked-slots", async (req, res, next) => {
-  //   let resultSet = {
-  //     message: "User Signin-up module",
-  //     result: [],
-  //     totalRows: 0,
-  //   };
+const { getBookedSlotsSchema } = require(path.resolve(
+  "src/modules/booking/Schema"
+));
 
-  const reqObj = req.body;
-  var resultSet = await bookingServ.fetchSlotsBooked(reqObj);
-  console.log("resultSet is:", resultSet);
+router.post(
+  "/get-booked-slots",
+  checkArenaExists(),
+  joiMiddleware(getBookedSlotsSchema, "getBookedSlots"),
+  async (req, res, next) => {
+    //   let resultSet = {
+    //     message: "User Signin-up module",
+    //     result: [],
+    //     totalRows: 0,
+    //   };
 
-  await Utils.retrunResponse(res, resultSet);
-});
+    const reqObj = req.body;
+    var resultSet = await bookingServ.fetchSlotsBooked(reqObj);
+    console.log("resultSet is:", resultSet);
+
+    await Utils.retrunResponse(res, resultSet);
+  }
+);
 
 router.post("/get-bookings-info", async (req, res, next) => {
   const reqObj = req.body;
@@ -39,19 +49,19 @@ router.post("/get-bookings-order-details", async (req, res, next) => {
 
   await Utils.retrunResponse(res, resultSet);
 });
- 
+
 // router.post("/pay-balance-amount", checkArenaExists(), async(req, res, next) => {
-  router.post("/pay-balance-amount", async(req, res, next) => {
+router.post("/pay-balance-amount", async (req, res, next) => {
   const reqObj = req.body;
   var resultSet = await bookingServ.payBalanceAmount(reqObj);
   await Utils.retrunResponse(res, resultSet);
-})
+});
 
 // router.post("/cancel-booking-order", checkArenaExists(), async(req, res, next) => {
-  router.post("/cancel-booking-order",  async(req, res, next) => {
+router.post("/cancel-booking-order", async (req, res, next) => {
   const reqObj = req.body;
   var resultSet = await bookingServ.cancelBookingOrder(reqObj);
   await Utils.retrunResponse(res, resultSet);
-})
+});
 
 module.exports = router;
